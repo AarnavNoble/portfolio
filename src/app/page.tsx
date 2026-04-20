@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* ── Data ──────────────────────────────────────────────────────────────────── */
 
@@ -84,6 +84,22 @@ function ScrollProgress() {
 
 function Nav() {
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("");
+
+  useEffect(() => {
+    const sections = ["projects", "about", "contact"];
+    const observers = sections.map((id) => {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActive(id); },
+        { rootMargin: "-40% 0px -55% 0px" }
+      );
+      obs.observe(el);
+      return obs;
+    });
+    return () => observers.forEach((o) => o?.disconnect());
+  }, []);
 
   return (
     <motion.nav
@@ -93,21 +109,31 @@ function Nav() {
       className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-[#0a0a0a]/80 border-b border-white/[0.04]"
     >
       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-        <a href="#" className="font-semibold text-sm tracking-tight text-white/90">
+        <a href="#" className="font-semibold text-sm tracking-tight text-white/90" onClick={() => setActive("")}>
           aarnav noble
         </a>
 
         {/* Desktop links */}
         <div className="hidden sm:flex items-center gap-6">
-          {["Projects", "About", "Contact"].map((s) => (
-            <a
-              key={s}
-              href={`#${s.toLowerCase()}`}
-              className="text-[13px] text-white/40 hover:text-white/80 transition-colors duration-200"
-            >
-              {s}
-            </a>
-          ))}
+          {["Projects", "About", "Contact"].map((s) => {
+            const isActive = active === s.toLowerCase();
+            return (
+              <a
+                key={s}
+                href={`#${s.toLowerCase()}`}
+                className={`relative text-[13px] transition-colors duration-200 ${isActive ? "text-white/90" : "text-white/40 hover:text-white/80"}`}
+              >
+                {s}
+                {isActive && (
+                  <motion.span
+                    layoutId="nav-indicator"
+                    className="absolute -bottom-[18px] left-0 right-0 h-[2px] bg-blue-500 rounded-full"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </a>
+            );
+          })}
           <a
             href={LINKS.github}
             target="_blank"
@@ -144,7 +170,7 @@ function Nav() {
                 key={s}
                 href={`#${s.toLowerCase()}`}
                 onClick={() => setOpen(false)}
-                className="text-sm text-white/50 hover:text-white/80 transition-colors"
+                className={`text-sm transition-colors ${active === s.toLowerCase() ? "text-white/80" : "text-white/50 hover:text-white/80"}`}
               >
                 {s}
               </a>
@@ -167,6 +193,16 @@ function Nav() {
 function Hero() {
   return (
     <div className="min-h-[90vh] flex items-center relative overflow-hidden">
+      {/* Dot grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%)",
+          WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%)",
+        }}
+      />
       {/* Gradient orbs */}
       <div className="absolute top-[-20%] left-[-10%] w-[400px] sm:w-[500px] h-[400px] sm:h-[500px] rounded-full bg-blue-500/[0.06] blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] rounded-full bg-purple-500/[0.04] blur-[100px] pointer-events-none" />
@@ -192,7 +228,7 @@ function Hero() {
 
           <motion.h1
             variants={fadeUp}
-            className="text-[44px] sm:text-6xl md:text-7xl font-extrabold tracking-[-0.04em] leading-[0.95]"
+            className="text-[44px] sm:text-6xl md:text-7xl font-extrabold tracking-[-0.04em] leading-[0.95] bg-gradient-to-br from-white via-white/90 to-white/40 bg-clip-text text-transparent"
           >
             Aarnav Noble
           </motion.h1>
@@ -520,9 +556,27 @@ function Contact() {
 function Footer() {
   return (
     <footer className="border-t border-white/[0.04] py-8">
-      <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
-        <p className="text-[12px] text-white/15">Aarnav Noble</p>
-        <p className="text-[12px] text-white/15">Built with Next.js</p>
+      <div className="max-w-5xl mx-auto px-6 flex items-center justify-between gap-4">
+        <p className="text-[12px] text-white/15">
+          &copy; {new Date().getFullYear()} Aarnav Noble
+        </p>
+        <div className="flex items-center gap-5">
+          {[
+            { label: "GitHub", href: LINKS.github },
+            { label: "LinkedIn", href: LINKS.linkedin },
+          ].map((l) => (
+            <a
+              key={l.label}
+              href={l.href}
+              target="_blank"
+              rel="noopener"
+              className="text-[12px] text-white/15 hover:text-white/40 transition-colors duration-200"
+            >
+              {l.label}
+            </a>
+          ))}
+          <p className="text-[12px] text-white/10">Built with Next.js</p>
+        </div>
       </div>
     </footer>
   );
