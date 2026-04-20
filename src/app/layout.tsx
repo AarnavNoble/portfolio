@@ -13,13 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aarnav Noble",
+  title: "Aarnav Noble — Software Engineer",
   description: "Software engineer building intelligent systems. ML, full-stack, and everything in between.",
+  metadataBase: new URL("https://aarnavnoble.com"),
   openGraph: {
     title: "Aarnav Noble",
-    description: "Software engineer building intelligent systems.",
+    description: "Software engineer building intelligent systems. ML, full-stack, and everything in between.",
     type: "website",
+    siteName: "Aarnav Noble",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aarnav Noble",
+    description: "Software engineer building intelligent systems.",
+  },
+  icons: { icon: "/favicon.ico" },
 };
 
 export default function RootLayout({
