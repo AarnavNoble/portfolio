@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 
 /* ── Data ──────────────────────────────────────────────────────────────────── */
@@ -8,7 +8,7 @@ import { useRef, useState } from "react";
 const LINKS = {
   github: "https://github.com/AarnavNoble",
   linkedin: "https://linkedin.com/in/aarnav-noble",
-  email: "mailto:aarnav@example.com",
+  email: "mailto:aarnavnoble14@gmail.com",
 };
 
 const PROJECTS = [
@@ -70,6 +70,17 @@ const fadeUp = {
 };
 
 /* ── Components ────────────────────────────────────────────────────────────── */
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+  return (
+    <motion.div
+      style={{ scaleX, transformOrigin: "left" }}
+      className="fixed top-0 left-0 right-0 h-[2px] bg-blue-500 z-[60] origin-left"
+    />
+  );
+}
 
 function Nav() {
   const [open, setOpen] = useState(false);
@@ -167,6 +178,11 @@ function Hero() {
           variants={stagger}
           className="max-w-2xl"
         >
+          <motion.div variants={fadeUp} className="mb-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06]">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-[11px] text-white/30 font-mono">currently building Roam</span>
+          </motion.div>
+
           <motion.p
             variants={fadeUp}
             className="text-sm font-mono text-blue-400/80 mb-4 tracking-wide"
@@ -436,6 +452,16 @@ function About() {
 }
 
 function Contact() {
+  const [copied, setCopied] = useState(false);
+
+  function copyEmail(e: React.MouseEvent) {
+    e.preventDefault();
+    navigator.clipboard.writeText("aarnavnoble14@gmail.com").then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
   return (
     <Section className="py-20 sm:py-24">
       <div className="max-w-5xl mx-auto px-6" id="contact">
@@ -452,15 +478,28 @@ function Contact() {
           </p>
 
           <div className="flex flex-col gap-3">
+            {/* Email — copy to clipboard */}
+            <button
+              onClick={copyEmail}
+              className="group flex items-center justify-between py-3 px-4 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] transition-all duration-200 text-left w-full"
+            >
+              <span className="text-[12px] text-white/30 uppercase tracking-wider">Email</span>
+              <span className="text-[14px] text-white/50 group-hover:text-white/80 transition-colors flex items-center gap-2">
+                aarnavnoble14@gmail.com
+                <span className="text-[11px] text-white/20 group-hover:text-blue-400/60 transition-colors font-mono">
+                  {copied ? "copied!" : "copy"}
+                </span>
+              </span>
+            </button>
+
             {[
-              { label: "Email", href: LINKS.email, display: "aarnav@example.com" },
               { label: "GitHub", href: LINKS.github, display: "AarnavNoble" },
               { label: "LinkedIn", href: LINKS.linkedin, display: "aarnav-noble" },
             ].map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                target={link.href.startsWith("mailto") ? undefined : "_blank"}
+                target="_blank"
                 rel="noopener"
                 className="group flex items-center justify-between py-3 px-4 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-white/[0.12] transition-all duration-200"
               >
@@ -494,6 +533,7 @@ function Footer() {
 export default function Home() {
   return (
     <>
+      <ScrollProgress />
       <Nav />
       <main className="pt-14">
         <Hero />
