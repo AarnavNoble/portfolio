@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useInView, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 /* ── Data ──────────────────────────────────────────────────────────────────── */
@@ -271,8 +271,13 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const mx = useMotionValue(-999);
+  const my = useMotionValue(-999);
+  const [hovering, setHovering] = useState(false);
+
   const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [4, -4]), { stiffness: 300, damping: 30 });
   const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-4, 4]), { stiffness: 300, damping: 30 });
+  const spotlightBg = useMotionTemplate`radial-gradient(380px circle at ${mx}px ${my}px, rgba(255,255,255,0.05), transparent 70%)`;
 
   function handleMouse(e: React.MouseEvent) {
     const el = ref.current;
@@ -280,18 +285,30 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
     const rect = el.getBoundingClientRect();
     x.set((e.clientX - rect.left) / rect.width - 0.5);
     y.set((e.clientY - rect.top) / rect.height - 0.5);
+    mx.set(e.clientX - rect.left);
+    my.set(e.clientY - rect.top);
   }
 
-  function handleLeave() { x.set(0); y.set(0); }
+  function handleLeave() {
+    x.set(0); y.set(0);
+    setHovering(false);
+  }
 
   return (
     <motion.div
       ref={ref}
       onMouseMove={handleMouse}
       onMouseLeave={handleLeave}
+      onMouseEnter={() => setHovering(true)}
       style={{ rotateX, rotateY, transformPerspective: 800 }}
-      className={className}
+      className={`relative ${className}`}
     >
+      {hovering && (
+        <motion.div
+          className="absolute inset-0 rounded-2xl pointer-events-none z-10"
+          style={{ background: spotlightBg }}
+        />
+      )}
       {children}
     </motion.div>
   );
@@ -368,11 +385,22 @@ function ProjectCard({ project }: { project: (typeof PROJECTS)[0] }) {
           {project.pipeline && (
             <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-4 sm:p-5 mb-6 overflow-x-auto">
               <p className="text-[10px] text-white/20 uppercase tracking-widest mb-3 font-medium">Pipeline</p>
-              <div className="flex items-start gap-0 sm:gap-1 min-w-max">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } }}
+                className="flex items-start gap-0 sm:gap-1 min-w-max"
+              >
                 {project.pipeline.map((step, i) => (
-                  <PipelineStep key={step.label} step={step} index={i} total={project.pipeline.length} />
+                  <motion.div
+                    key={step.label}
+                    variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}
+                  >
+                    <PipelineStep step={step} index={i} total={project.pipeline.length} />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           )}
 
@@ -584,7 +612,42 @@ function Footer() {
 
 /* ── Page ──────────────────────────────────────────────────────────────────── */
 
+function Toast({ message, visible }: { message: string; visible: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16, scale: 0.95 }}
+      animate={visible ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 16, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-4 py-2 rounded-xl bg-white/[0.08] border border-white/[0.1] backdrop-blur-md text-[13px] text-white/70 font-mono pointer-events-none"
+    >
+      {message}
+    </motion.div>
+  );
+}
+
 export default function Home() {
+  const [toast, setToast] = useState<{ message: string; id: number } | null>(null);
+
+  function showToast(message: string) {
+    const id = Date.now();
+    setToast({ message, id });
+    setTimeout(() => setToast((t) => (t?.id === id ? null : t)), 2000);
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "g" || e.key === "G") window.open(LINKS.github, "_blank");
+      if (e.key === "l" || e.key === "L") window.open(LINKS.linkedin, "_blank");
+      if (e.key === "e" || e.key === "E") {
+        navigator.clipboard.writeText("aarnavnoble14@gmail.com").then(() => showToast("Email copied"));
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <>
       <ScrollProgress />
@@ -596,6 +659,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <Toast message={toast?.message ?? ""} visible={!!toast} />
     </>
   );
 }
