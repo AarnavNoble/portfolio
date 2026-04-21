@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useInView, useMotionTemplate, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 /* ── Data ──────────────────────────────────────────────────────────────────── */
@@ -79,6 +79,33 @@ function ScrollProgress() {
       style={{ scaleX, transformOrigin: "left" }}
       className="fixed top-0 left-0 right-0 h-[2px] bg-blue-500 z-[60] origin-left"
     />
+  );
+}
+
+function ScrollToTop() {
+  const { scrollY } = useScroll();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    return scrollY.on("change", (y) => setVisible(y > 500));
+  }, [scrollY]);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 8 }}
+          transition={{ duration: 0.2 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-white/40 hover:text-white/70 hover:bg-white/[0.1] hover:border-white/[0.15] transition-all duration-200 text-sm"
+          aria-label="Back to top"
+        >
+          ↑
+        </motion.button>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -444,7 +471,7 @@ function Projects() {
           ))}
         </motion.div>
 
-        {/* Placeholder */}
+        {/* WIP cards */}
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -452,12 +479,31 @@ function Projects() {
           variants={stagger}
           className="mt-6 grid sm:grid-cols-2 gap-6"
         >
-          <motion.div
-            variants={fadeUp}
-            className="rounded-2xl border border-dashed border-white/[0.06] p-6 flex items-center justify-center min-h-[140px]"
-          >
-            <p className="text-sm text-white/20">More projects coming soon.</p>
-          </motion.div>
+          {[
+            { label: "ML project", detail: "Ranking + retrieval research", color: "#8B5CF6" },
+            { label: "Open source", detail: "Developer tooling", color: "#10B981" },
+          ].map((card) => (
+            <motion.div
+              key={card.label}
+              variants={fadeUp}
+              className="group rounded-2xl border border-dashed border-white/[0.06] hover:border-white/[0.1] p-6 min-h-[140px] flex flex-col justify-between transition-colors duration-300 relative overflow-hidden"
+            >
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{
+                  background: `radial-gradient(300px circle at 50% 50%, ${card.color}08, transparent 70%)`,
+                }}
+              />
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: card.color + "80" }} />
+                <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">In progress</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white/30">{card.label}</p>
+                <p className="text-[12px] text-white/15 mt-0.5">{card.detail}</p>
+              </div>
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </Section>
@@ -584,10 +630,13 @@ function Contact() {
 function Footer() {
   return (
     <footer className="border-t border-white/[0.04] py-8">
-      <div className="max-w-5xl mx-auto px-6 flex items-center justify-between gap-4">
-        <p className="text-[12px] text-white/15">
-          &copy; {new Date().getFullYear()} Aarnav Noble
-        </p>
+      <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <p className="text-[12px] text-white/15">&copy; {new Date().getFullYear()} Aarnav Noble</p>
+          <p className="hidden sm:block text-[11px] text-white/[0.07] mt-1 font-mono">
+            press <kbd className="px-1 py-0.5 rounded bg-white/[0.04] text-white/20">g</kbd> · <kbd className="px-1 py-0.5 rounded bg-white/[0.04] text-white/20">l</kbd> · <kbd className="px-1 py-0.5 rounded bg-white/[0.04] text-white/20">e</kbd>
+          </p>
+        </div>
         <div className="flex items-center gap-5">
           {[
             { label: "GitHub", href: LINKS.github },
@@ -659,6 +708,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <ScrollToTop />
       <Toast message={toast?.message ?? ""} visible={!!toast} />
     </>
   );
