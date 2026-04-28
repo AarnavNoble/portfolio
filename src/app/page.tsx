@@ -15,9 +15,9 @@ const PROJECTS = [
   {
     title: "Roam",
     description:
-      "AI-powered travel itinerary generator. Give it a destination and your interests — it returns an optimized day with stops ordered to minimize travel time.",
+      "AI travel itinerary generator. Input a destination and interest profile — get back a route-optimized day plan with stops ordered to minimize travel time.",
     longDescription:
-      "Full ML stack: RAG retrieval over scraped travel content, LightGBM LambdaRank scoring, OR-Tools VRP route optimization, and LLM synthesis. Not an LLM wrapper.",
+      "End-to-end ML stack: dense retrieval over scraped travel content, LightGBM LambdaRank for POI scoring, OR-Tools VRP for route optimization, and a Groq-backed synthesis pass. Not a prompt wrapper.",
     stack: ["Python", "FastAPI", "LightGBM", "FAISS", "OR-Tools", "React Native", "Groq"],
     href: "https://github.com/AarnavNoble/roam",
     demo: "https://huggingface.co/spaces/AarnavNoble/roam",
@@ -31,14 +31,92 @@ const PROJECTS = [
       { label: "LLM Synthesize", color: "#EC4899", detail: "Groq Llama 3.3" },
     ],
   },
+  {
+    title: "Dothraki ASR",
+    description:
+      "Zero-shot speech recognition for Dothraki — a constructed language with no training data. Tests the limits of multilingual ASR models on an out-of-distribution language.",
+    longDescription:
+      "Vocal isolation with Demucs, zero-shot transcription with mlx-whisper, IPA phoneme extraction, then a custom matching engine that maps phoneme sequences to real Dothraki lexicon entries. Runs locally on Apple Silicon.",
+    stack: ["Python", "mlx-whisper", "Demucs", "espeak-ng", "Next.js"],
+    href: "https://github.com/AarnavNoble/dothraki-asr",
+    demo: null,
+    featured: false,
+    color: "#8B5CF6",
+    pipeline: [
+      { label: "Vocal Isolation", color: "#8B5CF6", detail: "Demucs" },
+      { label: "Zero-Shot ASR", color: "#3B82F6", detail: "mlx-whisper" },
+      { label: "IPA Phonemes", color: "#F59E0B", detail: "espeak-ng" },
+      { label: "Dothraki Match", color: "#10B981", detail: "custom engine" },
+      { label: "Translation", color: "#EC4899", detail: "lexicon lookup" },
+    ],
+  },
 ];
 
+const EXPERIENCE = [
+  {
+    company: "AethexAI",
+    companyDetail: "Stealth voice AI startup · London, UK",
+    title: "Member of Technical Staff — Intern",
+    period: "Jan 2026 – Apr 2026",
+    bullets: [
+      "Built an async post-call ML pipeline to automatically correct ASR transcription errors using an LLM judge — parallelized per-turn execution across every production call, zero latency added to the live path.",
+      "Resolved interrupt-handling failures in a sub-500ms voice pipeline by implementing a 5-phase conversation state machine; fixed recording timeline drift across WebRTC, telephony, and WebSocket transports.",
+      "Designed and shipped the platform's external developer API and Python SDK across 100+ REST and WebSocket endpoints: session lifecycle, outbound call triggering, event-driven webhooks, browser SDK auth.",
+      "Operated on AWS/EKS: Kubernetes deployments, Terraform infra, CI/CD pipelines, OIDC-based secret management — supporting 500+ pods in production.",
+    ],
+  },
+  {
+    company: "Environment and Climate Change Canada",
+    companyDetail: "Burlington, Ontario",
+    title: "AI/ML Developer",
+    period: "May 2025 – Aug 2025",
+    bullets: [
+      "Designed and built a basin-wide Graph Neural Network (PyTorch) for Lake Erie concentration forecasting integrating satellite and atmospheric data — 5× more spatial coverage than traditional approaches.",
+      "Engineered an XGBoost pipeline with multi-source spatial feature engineering (weather, satellite, soil data), improving predictive accuracy by 85%.",
+    ],
+  },
+  {
+    company: "Toronto Transit Commission",
+    companyDetail: "Toronto, Ontario",
+    title: "Software Analyst",
+    period: "Sep 2024 – Dec 2024",
+    bullets: [
+      "Automated OS imaging via PXE boot and bash scripting for 2000+ devices, improving imaging speeds by 50%.",
+      "Executed remote software migration for 400+ devices using DSM, improving operational efficiency by 60%.",
+    ],
+  },
+  {
+    company: "UW Orbital",
+    companyDetail: "Waterloo, Ontario",
+    title: "Firmware & Control Systems Developer",
+    period: "Jan 2024 – Dec 2024",
+    bullets: [
+      "Built a peripheral driver for the LM75BD temperature sensor in C over I2C, with real-time over-temperature shutdown under FreeRTOS.",
+      "Programmed STM32 microcontroller for satellite thermal control using MATLAB and Simulink.",
+    ],
+  },
+];
+
+const EDUCATION = {
+  school: "University of Waterloo",
+  degree: "B.ASc. Honours Computer Engineering",
+  period: "Sept. 2023 – Apr. 2028 (expected)",
+  location: "Waterloo, Ontario",
+  courses: [
+    "Data Structures & Algorithms",
+    "Systems Programming & Concurrency",
+    "Digital Circuits (VHDL)",
+    "Embedded Microprocessor Systems",
+    "Signals & Systems",
+  ],
+};
+
 const STACK_GROUPS = [
-  { label: "Languages", items: ["Python", "TypeScript", "JavaScript"] },
-  { label: "ML / Data", items: ["PyTorch", "LightGBM", "FAISS", "sentence-transformers", "OR-Tools"] },
-  { label: "Backend", items: ["FastAPI", "Node.js", "PostgreSQL", "Redis"] },
-  { label: "Frontend", items: ["React", "Next.js", "React Native", "Tailwind CSS"] },
-  { label: "Infra", items: ["Docker", "Railway", "Vercel", "GitHub Actions"] },
+  { label: "Languages", items: ["Python", "C/C++", "TypeScript", "Java", "MATLAB", "SQL", "Bash"] },
+  { label: "ML / AI", items: ["PyTorch", "XGBoost", "scikit-learn", "TensorFlow", "LightGBM", "FAISS"] },
+  { label: "Infra", items: ["Kubernetes", "Terraform", "Docker", "AWS / EKS", "GitHub Actions", "PostgreSQL"] },
+  { label: "Backend", items: ["FastAPI", "Node.js", "WebRTC", "DynamoDB", "Redis"] },
+  { label: "Frontend", items: ["React", "Next.js", "React Native"] },
 ];
 
 /* ── Animation helpers ─────────────────────────────────────────────────────── */
@@ -114,7 +192,7 @@ function Nav() {
   const [active, setActive] = useState("");
 
   useEffect(() => {
-    const sections = ["projects", "about", "contact"];
+    const sections = ["projects", "experience", "about", "contact"];
     const observers = sections.map((id) => {
       const el = document.getElementById(id);
       if (!el) return null;
@@ -142,7 +220,7 @@ function Nav() {
 
         {/* Desktop links */}
         <div className="hidden sm:flex items-center gap-6">
-          {["Projects", "About", "Contact"].map((s) => {
+          {["Projects", "Experience", "About", "Contact"].map((s) => {
             const isActive = active === s.toLowerCase();
             return (
               <a
@@ -192,7 +270,7 @@ function Nav() {
           className="sm:hidden border-t border-white/[0.04] bg-[#0a0a0a]/95 backdrop-blur-md"
         >
           <div className="px-6 py-4 flex flex-col gap-4">
-            {["Projects", "About", "Contact"].map((s) => (
+            {["Projects", "Experience", "About", "Contact"].map((s) => (
               <a
                 key={s}
                 href={`#${s.toLowerCase()}`}
@@ -241,36 +319,29 @@ function Hero() {
           variants={stagger}
           className="max-w-2xl"
         >
-          <motion.div variants={fadeUp} className="mb-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06]">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-[11px] text-white/30 font-mono">currently building Roam</span>
-          </motion.div>
-
-          <motion.p
-            variants={fadeUp}
-            className="text-sm font-mono text-blue-400/80 mb-4 tracking-wide"
-          >
-            Hi, I&apos;m
-          </motion.p>
-
           <motion.h1
             variants={fadeUp}
-            className="text-[44px] sm:text-6xl md:text-7xl font-extrabold tracking-[-0.04em] leading-[0.95] bg-gradient-to-br from-white via-white/90 to-white/40 bg-clip-text text-transparent"
+            className="text-[44px] sm:text-6xl md:text-7xl font-extrabold tracking-[-0.04em] leading-[0.95] text-white"
           >
             Aarnav Noble
           </motion.h1>
 
-          <motion.div variants={fadeUp} className="mt-4">
-            <div className="h-[3px] w-10 bg-blue-500 rounded-full" />
+          <motion.div variants={fadeUp} className="mt-5">
+            <div className="h-[2px] w-8 bg-blue-500/70 rounded-full" />
           </motion.div>
 
           <motion.p
             variants={fadeUp}
-            className="mt-6 text-base sm:text-xl text-white/40 leading-relaxed max-w-lg"
+            className="mt-5 text-base sm:text-lg text-white/40 leading-relaxed max-w-lg"
           >
-            Software engineer building intelligent systems.{" "}
-            <span className="text-white/60">ML, full-stack, and everything in between.</span>
+            Computer Engineering at Waterloo. I build ML systems and the infrastructure
+            to run them — real-time pipelines, retrieval, ranking, and embedded firmware.
           </motion.p>
+
+          <motion.div variants={fadeUp} className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/[0.03] border border-white/[0.05]">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400/70 animate-pulse" />
+            <span className="text-[11px] text-white/25 font-mono tracking-wide">currently building · Roam</span>
+          </motion.div>
 
           <motion.div variants={fadeUp} className="mt-10 flex gap-3 sm:gap-4">
             <a
@@ -471,40 +542,6 @@ function Projects() {
           ))}
         </motion.div>
 
-        {/* WIP cards */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={stagger}
-          className="mt-6 grid sm:grid-cols-2 gap-6"
-        >
-          {[
-            { label: "ML project", detail: "Ranking + retrieval research", color: "#8B5CF6" },
-            { label: "Open source", detail: "Developer tooling", color: "#10B981" },
-          ].map((card) => (
-            <motion.div
-              key={card.label}
-              variants={fadeUp}
-              className="group rounded-2xl border border-dashed border-white/[0.06] hover:border-white/[0.1] p-6 min-h-[140px] flex flex-col justify-between transition-colors duration-300 relative overflow-hidden"
-            >
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{
-                  background: `radial-gradient(300px circle at 50% 50%, ${card.color}08, transparent 70%)`,
-                }}
-              />
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: card.color + "80" }} />
-                <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">In progress</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-white/30">{card.label}</p>
-                <p className="text-[12px] text-white/15 mt-0.5">{card.detail}</p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
     </Section>
   );
@@ -525,16 +562,35 @@ function About() {
           {/* Bio */}
           <div>
             <p className="text-[15px] text-white/50 leading-[1.8]">
-              I build software that thinks. My work sits at the intersection of machine learning and product engineering
-              &mdash; taking models from training to production systems that people actually use.
+              Computer Engineering student at the University of Waterloo, on co-op.
+              Most recently MTS at AethexAI — a stealth voice AI startup in London — working across
+              a sub-500ms real-time streaming pipeline and the production AWS/EKS infrastructure behind it.
             </p>
             <p className="text-[15px] text-white/50 leading-[1.8] mt-4">
-              Currently focused on ML-powered applications: retrieval systems, learning-to-rank, route optimization,
-              and the infrastructure to serve them reliably.
+              Before that, ML at Environment and Climate Change Canada building GNN and XGBoost pipelines
+              for satellite-derived environmental forecasting.
             </p>
             <p className="text-[15px] text-white/30 leading-[1.8] mt-4">
-              When I&apos;m not coding, you&apos;ll find me exploring new cities &mdash; which is partly why I built Roam.
+              Personal projects focus on the ML side: retrieval systems, ranking, and pushing ASR
+              models into domains they weren&apos;t trained for.
             </p>
+
+            {/* Education */}
+            <div className="mt-8 pt-8 border-t border-white/[0.05]">
+              <p className="text-[11px] text-white/25 uppercase tracking-widest mb-4">Education</p>
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-3">
+                <span className="text-[14px] font-semibold text-white/70">{EDUCATION.school}</span>
+                <span className="text-[12px] font-mono text-white/20 tabular-nums">{EDUCATION.period}</span>
+              </div>
+              <p className="text-[13px] text-white/35 mb-3">{EDUCATION.degree} · {EDUCATION.location}</p>
+              <div className="flex flex-wrap gap-2">
+                {EDUCATION.courses.map((c) => (
+                  <span key={c} className="text-[11px] text-white/25 px-2.5 py-1 rounded-md bg-white/[0.03] border border-white/[0.05]">
+                    {c}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Stack */}
@@ -553,6 +609,63 @@ function About() {
                   ))}
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function Experience() {
+  return (
+    <Section className="py-20 sm:py-24">
+      <div className="max-w-5xl mx-auto px-6" id="experience">
+        <div className="flex items-center gap-3 mb-12">
+          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          <h2 className="text-sm font-medium text-white/30 uppercase tracking-[0.15em]">Experience</h2>
+        </div>
+
+        <div className="relative">
+          {/* Timeline line */}
+          <div className="absolute left-0 top-2 bottom-2 w-px bg-white/[0.05] hidden sm:block" />
+
+          <div className="space-y-10">
+            {EXPERIENCE.map((role, idx) => (
+              <motion.div
+                key={role.company + role.period}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5, delay: idx * 0.05, ease: [0.25, 0.1, 0.25, 1] as const }}
+                className="sm:pl-8 relative"
+              >
+                {/* Timeline dot */}
+                <div className="absolute left-[-4px] top-[6px] w-[9px] h-[9px] rounded-full border border-white/20 bg-[#0a0a0a] hidden sm:block" />
+
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-3">
+                  <div>
+                    <span className="text-[15px] font-semibold text-white/80 tracking-tight">{role.company}</span>
+                    <span className="text-[13px] text-white/30 ml-2">{role.companyDetail}</span>
+                  </div>
+                  <span className="text-[12px] font-mono text-white/20 shrink-0 tabular-nums">{role.period}</span>
+                </div>
+
+                <p className="text-[12px] text-blue-400/50 font-medium mb-3 tracking-wide">{role.title}</p>
+
+                <ul className="space-y-2">
+                  {role.bullets.map((bullet, i) => (
+                    <li key={i} className="flex gap-3 text-[13px] text-white/40 leading-relaxed">
+                      <span className="mt-[8px] w-[3px] h-[3px] rounded-full bg-white/20 shrink-0" />
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
+
+                {idx < EXPERIENCE.length - 1 && (
+                  <div className="mt-10 border-b border-white/[0.04] sm:hidden" />
+                )}
+              </motion.div>
             ))}
           </div>
         </div>
@@ -704,6 +817,7 @@ export default function Home() {
       <main className="pt-14">
         <Hero />
         <Projects />
+        <Experience />
         <About />
         <Contact />
       </main>
