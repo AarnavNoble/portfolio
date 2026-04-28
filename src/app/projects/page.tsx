@@ -1,33 +1,47 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { PROJECTS, LINKS } from "@/lib/data";
-
-const fade = (delay = 0) => ({
-  initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.4, delay, ease: [0.25, 0.1, 0.25, 1] as const },
-});
 
 function Pipeline({ steps }: { steps: typeof PROJECTS[0]["pipeline"] }) {
   return (
-    <div className="my-6 border border-white/[0.06] rounded-lg overflow-hidden">
-      <div className="px-4 py-2 border-b border-white/[0.05] bg-white/[0.015]">
-        <span className="text-[11px] text-white/25 uppercase tracking-widest font-medium">Pipeline</span>
+    <div className="my-7 rounded-lg overflow-hidden" style={{ border: "1px solid var(--g4)" }}>
+      <div
+        className="px-4 py-2 flex items-center gap-2"
+        style={{ background: "var(--g2)", borderBottom: "1px solid var(--g4)" }}
+      >
+        <span className="text-[11px] uppercase tracking-widest font-medium" style={{ color: "var(--g7)" }}>
+          Pipeline
+        </span>
       </div>
-      <div className="divide-y divide-white/[0.04]">
+      <div>
         {steps.map((s, i) => (
-          <div key={s.step} className="flex gap-4 px-4 py-3">
-            <span className="text-[11px] font-mono text-white/20 w-4 shrink-0 mt-[2px]">
+          <div
+            key={s.step}
+            className="flex gap-4 px-4 py-3"
+            style={{ borderBottom: i < steps.length - 1 ? "1px solid var(--g3)" : "none" }}
+          >
+            <span
+              className="text-[11px] font-mono w-5 shrink-0 pt-[2px] tabular-nums"
+              style={{ color: "var(--g6)" }}
+            >
               {String(i + 1).padStart(2, "0")}
             </span>
             <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-baseline gap-x-2 mb-0.5">
-                <span className="text-[13px] font-medium text-white/70">{s.step}</span>
-                <span className="text-[11px] font-mono text-white/25">{s.tech}</span>
+              <div className="flex flex-wrap items-baseline gap-x-2.5 mb-1">
+                <span className="text-[13px] font-medium" style={{ color: "var(--g11)" }}>
+                  {s.step}
+                </span>
+                <span
+                  className="text-[11px] font-mono px-1.5 py-0.5 rounded"
+                  style={{ color: "var(--g8)", background: "var(--g3)" }}
+                >
+                  {s.tech}
+                </span>
               </div>
-              <p className="text-[12px] text-white/35 leading-relaxed">{s.detail}</p>
+              <p className="text-[12px] leading-relaxed" style={{ color: "var(--g8)" }}>
+                {s.detail}
+              </p>
             </div>
           </div>
         ))}
@@ -36,29 +50,31 @@ function Pipeline({ steps }: { steps: typeof PROJECTS[0]["pipeline"] }) {
   );
 }
 
-function RoamOutput({ data }: { data: typeof PROJECTS[0]["sampleOutput"] }) {
+function RoamSample({ data }: { data: typeof PROJECTS[0]["sampleOutput"] }) {
   if (!("days" in data) || !data.days) return null;
   return (
-    <div className="my-6 border border-white/[0.06] rounded-lg overflow-hidden">
-      <div className="px-4 py-2 border-b border-white/[0.05] bg-white/[0.015] flex items-center justify-between">
-        <span className="text-[11px] text-white/25 uppercase tracking-widest font-medium">Sample output</span>
-        <span className="text-[11px] font-mono text-white/20">{data.label}</span>
+    <div className="my-7 terminal">
+      <div className="terminal-bar">
+        <div className="terminal-dot" style={{ background: "#ff5f57" }} />
+        <div className="terminal-dot" style={{ background: "#febc2e" }} />
+        <div className="terminal-dot" style={{ background: "#28c840" }} />
+        <span className="ml-2 text-[11px]" style={{ color: "var(--g8)" }}>{data.label}</span>
       </div>
-      <div className="divide-y divide-white/[0.04]">
+      <div className="px-4 py-3 space-y-4">
         {data.days.map((day) => (
           <div key={day.day}>
-            <div className="px-4 py-2 bg-white/[0.01]">
-              <span className="text-[11px] font-mono text-white/30">{day.day}</span>
-            </div>
+            <p className="text-[11px] uppercase tracking-widest mb-2" style={{ color: "var(--g7)" }}>
+              {day.day}
+            </p>
             {day.stops.map((stop) => (
-              <div key={stop.name} className="flex gap-4 px-4 py-2.5">
-                <span className="text-[11px] font-mono text-white/20 w-10 shrink-0 mt-[2px] tabular-nums">{stop.time}</span>
+              <div key={stop.name} className="flex gap-3 mb-2">
+                <span className="text-[11px] font-mono tabular-nums pt-[1px] w-10 shrink-0" style={{ color: "var(--g7)" }}>
+                  {stop.time}
+                </span>
                 <div>
-                  <div className="flex flex-wrap items-baseline gap-x-2">
-                    <span className="text-[13px] text-white/65">{stop.name}</span>
-                    <span className="text-[11px] text-white/25">{stop.area}</span>
-                  </div>
-                  <p className="text-[12px] text-white/30 mt-0.5 leading-relaxed">{stop.note}</p>
+                  <span className="text-[13px] font-medium" style={{ color: "var(--g11)" }}>{stop.name}</span>
+                  <span className="text-[12px] ml-2" style={{ color: "var(--g7)" }}>{stop.area}</span>
+                  <p className="text-[12px] leading-relaxed" style={{ color: "var(--g7)" }}>{stop.note}</p>
                 </div>
               </div>
             ))}
@@ -69,19 +85,31 @@ function RoamOutput({ data }: { data: typeof PROJECTS[0]["sampleOutput"] }) {
   );
 }
 
-function DothrakiOutput({ data }: { data: typeof PROJECTS[1]["sampleOutput"] }) {
+function DothrakiSample({ data }: { data: typeof PROJECTS[1]["sampleOutput"] }) {
   if (!("steps" in data) || !data.steps) return null;
   return (
-    <div className="my-6 border border-white/[0.06] rounded-lg overflow-hidden">
-      <div className="px-4 py-2 border-b border-white/[0.05] bg-white/[0.015] flex items-center justify-between">
-        <span className="text-[11px] text-white/25 uppercase tracking-widest font-medium">Sample trace</span>
-        <span className="text-[11px] font-mono text-white/20">{data.label}</span>
+    <div className="my-7 terminal">
+      <div className="terminal-bar">
+        <div className="terminal-dot" style={{ background: "#ff5f57" }} />
+        <div className="terminal-dot" style={{ background: "#febc2e" }} />
+        <div className="terminal-dot" style={{ background: "#28c840" }} />
+        <span className="ml-2 text-[11px]" style={{ color: "var(--g8)" }}>{data.label}</span>
       </div>
-      <div className="divide-y divide-white/[0.04]">
+      <div className="px-4 py-4 space-y-2.5">
         {data.steps.map((s, i) => (
-          <div key={i} className="flex gap-4 px-4 py-2.5">
-            <span className="text-[11px] font-mono text-white/20 w-28 shrink-0">{s.label}</span>
-            <span className="text-[13px] font-mono text-white/55">{s.value}</span>
+          <div key={i} className="flex gap-4">
+            <span
+              className="text-[11px] font-mono w-28 shrink-0 pt-[2px]"
+              style={{ color: "var(--g7)" }}
+            >
+              {s.label}
+            </span>
+            <span
+              className="text-[13px] font-mono"
+              style={{ color: i === data.steps!.length - 1 ? "var(--g12)" : "var(--g10)" }}
+            >
+              {s.value}
+            </span>
           </div>
         ))}
       </div>
@@ -92,37 +120,46 @@ function DothrakiOutput({ data }: { data: typeof PROJECTS[1]["sampleOutput"] }) 
 export default function Projects() {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.05] bg-[#0c0c0c]/90 backdrop-blur-sm">
-        <div className="max-w-[640px] mx-auto px-6 h-11 flex items-center justify-between">
-          <Link href="/" className="text-[13px] text-white/30 hover:text-white/60 transition-colors">
-            ← Aarnav Noble
-          </Link>
+      <div className="blur-fade" />
+
+      <nav className="fixed top-0 left-0 right-0 z-20">
+        <div className="max-w-[620px] mx-auto px-6 h-11 flex items-center justify-between">
+          <Link href="/" className="link-dim text-[13px]">← Aarnav Noble</Link>
           <div className="flex items-center gap-5">
-            <a href={LINKS.github} target="_blank" rel="noopener" className="text-[13px] text-white/30 hover:text-white/60 transition-colors">GitHub</a>
-            <Link href="/work" className="text-[13px] text-white/30 hover:text-white/60 transition-colors">Work</Link>
+            <Link href="/work" className="link-dim text-[13px]">Work</Link>
+            <a href={LINKS.github} target="_blank" rel="noopener" className="link-dim text-[13px]">GitHub</a>
           </div>
         </div>
       </nav>
 
-      <main className="flex-1 max-w-[640px] mx-auto px-6 pt-24 pb-20 w-full">
-        <motion.h1 {...fade(0)} className="text-[22px] font-semibold tracking-tight text-white/85 mb-14">
-          Projects
-        </motion.h1>
+      <main className="flex-1 max-w-[620px] mx-auto px-6 pt-24 pb-20 w-full">
+        <h1
+          data-animate
+          style={{ "--stagger": 0 } as React.CSSProperties}
+          className="text-[13px] font-medium uppercase tracking-widest mb-14"
+        >
+          <span style={{ color: "var(--g8)" }}>Projects</span>
+        </h1>
 
-        <div className="space-y-20">
+        <div>
           {PROJECTS.map((project, i) => (
-            <motion.div key={project.slug} {...fade(i * 0.06)}>
+            <div
+              key={project.slug}
+              data-animate
+              style={{ "--stagger": i + 1 } as React.CSSProperties}
+            >
               {/* Header */}
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <h2 className="text-[18px] font-semibold tracking-tight text-white/85">{project.name}</h2>
-                <div className="flex items-center gap-3 shrink-0 mt-0.5">
+              <div className="flex items-start justify-between gap-4 mb-2">
+                <h2 className="text-[20px] font-semibold tracking-tight" style={{ color: "var(--g12)" }}>
+                  {project.name}
+                </h2>
+                <div className="flex items-center gap-2.5 shrink-0 mt-1">
                   {project.demo && (
                     <a
                       href={project.demo}
                       target="_blank"
                       rel="noopener"
-                      className="text-[12px] text-white/40 hover:text-white/70 transition-colors border border-white/[0.08] rounded px-2.5 py-1 hover:border-white/[0.18]"
+                      className="link-dim text-[12px]"
                     >
                       Demo ↗
                     </a>
@@ -131,44 +168,53 @@ export default function Projects() {
                     href={project.github}
                     target="_blank"
                     rel="noopener"
-                    className="text-[12px] text-white/40 hover:text-white/70 transition-colors border border-white/[0.08] rounded px-2.5 py-1 hover:border-white/[0.18]"
+                    className="link-dim text-[12px]"
                   >
                     GitHub ↗
                   </a>
                 </div>
               </div>
 
-              <p className="text-[12px] text-white/30 italic mb-4">{project.tagline}</p>
-              <p className="text-[14px] text-white/50 leading-[1.75] mb-2">{project.description}</p>
+              <p className="text-[12px] italic mb-4" style={{ color: "var(--g8)" }}>
+                {project.tagline}
+              </p>
+              <p className="text-[14px] leading-[1.75] mb-1" style={{ color: "var(--g10)" }}>
+                {project.description}
+              </p>
 
-              {/* Pipeline */}
               <Pipeline steps={project.pipeline} />
 
-              {/* Sample output */}
               {"days" in project.sampleOutput
-                ? <RoamOutput data={project.sampleOutput} />
-                : <DothrakiOutput data={project.sampleOutput} />
+                ? <RoamSample data={project.sampleOutput} />
+                : <DothrakiSample data={project.sampleOutput} />
               }
 
               {/* Stack */}
-              <div className="flex flex-wrap gap-2 mt-4">
+              <div className="flex flex-wrap gap-2 mt-1">
                 {project.stack.map((t) => (
-                  <span key={t} className="text-[11px] font-mono text-white/30 px-2 py-0.5 rounded border border-white/[0.06]">
+                  <span
+                    key={t}
+                    className="text-[11px] font-mono px-2 py-0.5 rounded"
+                    style={{ color: "var(--g8)", background: "var(--g2)", border: "1px solid var(--g4)" }}
+                  >
                     {t}
                   </span>
                 ))}
               </div>
 
               {i < PROJECTS.length - 1 && (
-                <div className="mt-20 border-b border-white/[0.05]" />
+                <div
+                  className="my-16"
+                  style={{ borderBottom: "1px solid var(--g3)" }}
+                />
               )}
-            </motion.div>
+            </div>
           ))}
         </div>
       </main>
 
-      <footer className="max-w-[640px] mx-auto px-6 pb-8 w-full">
-        <p className="text-[11px] text-white/15">© {new Date().getFullYear()} Aarnav Noble</p>
+      <footer className="max-w-[620px] mx-auto px-6 pb-8 w-full">
+        <p className="text-[11px]" style={{ color: "var(--g6)" }}>© {new Date().getFullYear()} Aarnav Noble</p>
       </footer>
     </div>
   );
